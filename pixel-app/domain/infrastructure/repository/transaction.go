@@ -13,12 +13,12 @@ type TransactionRepositoryDB struct {
 
 func (t *TransactionRepositoryDB) Register(transaction *model.Transaction) error {
 	err := t.DB.Create(transaction).Error
-    return err
+	return err
 }
 
 func (t *TransactionRepositoryDB) Save(transaction *model.Transaction) error {
 	err := t.DB.Save(transaction).Error
-    return err
+	return err
 }
 
 func (t *TransactionRepositoryDB) Find(id string) (*model.Transaction, error) {
