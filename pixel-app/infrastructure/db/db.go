@@ -8,8 +8,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/murilo-toddy/pixel/domain/model"
-    _ "github.com/lib/pq"
 	_ "gorm.io/driver/sqlite"
 )
 

@@ -14,23 +14,23 @@ import (
 )
 
 func StartGrpcServer(database *gorm.DB, port int) {
-    grpcServer := grpc.NewServer()
-    reflection.Register(grpcServer)
+	grpcServer := grpc.NewServer()
+	reflection.Register(grpcServer)
 
-    pixRepository := repository.PixKeyRepositoryDB{DB: database}
-    pixUseCase := usecase.PixUseCase{PixKeyRepository: &pixRepository}
-    pixGrpcService := NewPixGrpcService(pixUseCase)
-    pb.RegisterPixServiceServer(grpcServer, pixGrpcService)
+	pixRepository := repository.PixKeyRepositoryDB{DB: database}
+	pixUseCase := usecase.PixUseCase{PixKeyRepository: &pixRepository}
+	pixGrpcService := NewPixGrpcService(pixUseCase)
+	pb.RegisterPixServiceServer(grpcServer, pixGrpcService)
 
-    address := fmt.Sprintf("0.0.0.0:%d", port)
-    listener, err := net.Listen("tcp", address)
-    if err != nil {
-        log.Fatal("Could not start grpc server: ", err)
-    }
+	address := fmt.Sprintf("0.0.0.0:%d", port)
+	listener, err := net.Listen("tcp", address)
+	if err != nil {
+		log.Fatal("Could not start grpc server: ", err)
+	}
 
-    log.Printf("gRPC server has started on port %d", port)
-    err = grpcServer.Serve(listener)
-    if err != nil {
-        log.Fatal("gRPC server stopped: ", err)
-    }
+	log.Printf("gRPC server has started on port %d", port)
+	err = grpcServer.Serve(listener)
+	if err != nil {
+		log.Fatal("gRPC server stopped: ", err)
+	}
 }
