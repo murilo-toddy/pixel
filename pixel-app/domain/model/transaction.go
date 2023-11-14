@@ -8,7 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-type TransactionRepository interface {
+type TransactionRepositoryInterface interface {
 	Register(transaction *Transaction) error
 	Save(transaction *Transaction) error
 	Find(id string) (*Transaction, error)
@@ -28,14 +28,16 @@ type Transactions struct {
 type Transaction struct {
 	Base              `valid:"required"`
 	AccountFrom       *Account `valid:"-"`
-	Amount            float64  `json:"amount" valid:"notnull"`
+	AccountFromID     string   `gorm:"column:account_from_id;type:uuid;" valid:"notnull"`
+	Amount            float64  `json:"amount" gorm:"type:float" valid:"notnull"`
 	PixKeyTo          *PixKey  `valid:"-"`
-	Status            string   `json:"status" valid:"notnull"`
-	Description       string   `json:"description" valid:"notnull"`
-	CancelDescription string   `json:"cancel_description" valid:"-"`
+	PixKeyToID        string   `gorm:"column:pix_key_to_id;type:uuid;" valid:"notnull"`
+	Status            string   `json:"status" gorm:"type:varchar(20)" valid:"notnull"`
+	Description       string   `json:"description" gorm:"type:varchar(255)" valid:"-"`
+	CancelDescription string   `json:"cancel_description" gorm:"type:varchar(255)" valid:"-"`
 }
 
-func (t *Transaction) isValid() error {
+func (t *Transaction) validate() error {
 	_, err := govalidator.ValidateStruct(t)
 
 	if t.Amount <= 0 {
@@ -49,17 +51,17 @@ func (t *Transaction) isValid() error {
 
 func NewTransaction(accountFrom *Account, amount float64, pixKeyTo *PixKey, description string) (*Transaction, error) {
 	transaction := Transaction{
-		AccountFrom: accountFrom,
-		Amount:      amount,
-		PixKeyTo:    pixKeyTo,
-		Status:      TransactionPending,
-		Description: description,
+		AccountFrom:   accountFrom,
+		AccountFromID: accountFrom.ID,
+		Amount:        amount,
+		PixKeyTo:      pixKeyTo,
+		PixKeyToID:    pixKeyTo.ID,
+		Status:        TransactionPending,
+		Description:   description,
 	}
-
 	transaction.ID = uuid.NewV4().String()
 	transaction.CreatedAt = time.Now()
-
-	err := transaction.isValid()
+	err := transaction.validate()
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +69,7 @@ func NewTransaction(accountFrom *Account, amount float64, pixKeyTo *PixKey, desc
 }
 
 func (t *Transaction) Complete() error {
-	if err := t.isValid(); err != nil {
+	if err := t.validate(); err != nil {
 		return err
 	}
 	t.Status = TransactionCompleted
@@ -76,7 +78,7 @@ func (t *Transaction) Complete() error {
 }
 
 func (t *Transaction) Confirm() error {
-	if err := t.isValid(); err != nil {
+	if err := t.validate(); err != nil {
 		return err
 	}
 	t.Status = TransactionConfirmed
@@ -85,7 +87,7 @@ func (t *Transaction) Confirm() error {
 }
 
 func (t *Transaction) Cancel(description string) error {
-	if err := t.isValid(); err != nil {
+	if err := t.validate(); err != nil {
 		return err
 	}
 	t.Status = TransactionError

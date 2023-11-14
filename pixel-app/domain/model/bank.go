@@ -8,13 +8,13 @@ import (
 )
 
 type Bank struct {
-	Base      `valid:"required"`
-	CreatedAt time.Time  `json:"created_at" valid:"notnull"`
-	UpdatedAt time.Time  `json:"updated_at" valid:"notnull"`
-	Accounts  []*Account `valid:"-"`
+	Base     `valid:"required"`
+	Code     string     `json:"code" gorm:"type:varchar(20)" valid:"notnull"`
+	Name     string     `json:"name" gorm:"type:varchar(255)" valid:"notnull"`
+	Accounts []*Account `gorm:"ForeignKey:BankID" valid:"-"`
 }
 
-func (bank *Bank) isValid() error {
+func (bank *Bank) validate() error {
 	_, err := govalidator.ValidateStruct(bank)
 	return err
 }
@@ -28,7 +28,7 @@ func NewBank(code, name string) (*Bank, error) {
 	bank.ID = uuid.NewV4().String()
 	bank.CreatedAt = time.Now()
 
-	err := bank.isValid()
+	err := bank.validate()
 	if err != nil {
 		return nil, err
 	}
