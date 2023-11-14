@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"github.com/murilo-toddy/pixel/domain/model"
-	"github.com/prometheus/common/log"
 )
 
 type TransactionUseCase struct {
