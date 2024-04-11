@@ -9,9 +9,9 @@ import (
 
 type Bank struct {
 	Base      `valid:"required"`
-	CreatedAt time.Time  `json:"created_at" valid:"notnull"`
-	UpdatedAt time.Time  `json:"updated_at" valid:"notnull"`
-	Accounts  []*Account `valid:"-"`
+    CreatedAt time.Time  `json:"created_at" gorm:"type:varchar(20)" valid:"notnull"`
+	UpdatedAt time.Time  `json:"updated_at" gorm:"type:varchar(255) "valid:"notnull"`
+    Accounts  []*Account `gorm:"ForeignKey:BankID" valid:"-"`
 }
 
 func (bank *Bank) isValid() error {
@@ -21,8 +21,8 @@ func (bank *Bank) isValid() error {
 
 func NewBank(code, name string) (*Bank, error) {
 	bank := Bank{
-		Code: code,
-		Name: name,
+        Code: code,
+        Name: name,
 	}
 
 	bank.ID = uuid.NewV4().String()

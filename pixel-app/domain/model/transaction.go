@@ -28,8 +28,11 @@ type Transactions struct {
 type Transaction struct {
 	Base              `valid:"required"`
 	AccountFrom       *Account `valid:"-"`
+    AccountIDFrom string    `gorm:"column:account_id_from;type:uuid" valid:"notnull"`
 	Amount            float64  `json:"amount" valid:"notnull"`
 	PixKeyTo          *PixKey  `valid:"-"`
+    PixKeyIDTo string    `gorm:"column:pix_key_id_to;type:uuid" valid:"notnull"`
+    BankID  string    `gorm:"column:bank_id;type:uuid;not null" valid:"-"`
 	Status            string   `json:"status" valid:"notnull"`
 	Description       string   `json:"description" valid:"notnull"`
 	CancelDescription string   `json:"cancel_description" valid:"-"`
